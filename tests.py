@@ -34,5 +34,5 @@ class TestBlackListLoading(unittest.TestCase):
                 hypothesis.assume(item.strip() == item)
                 #Assume no whitespace in middle of string
                 hypothesis.assume(item.split() ==[item])
-                f.write(str(item) + "\n")
+                f.write(item + "\n")
         assert bot.load_black_list(self.filename) == strings
