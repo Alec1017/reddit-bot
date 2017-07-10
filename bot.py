@@ -11,13 +11,7 @@ num_of_iterations = 10
 replies to reddit comments about salad dressings
 """
 
-# create the reddit object
-# reddit sees who accesses this info so be descriptive
-r = praw.Reddit(client_id='xxxxxxxxxxxxxx',
-                client_secret='xxxxxxxxxxxxxxxxxxxxx',
-                password='password',
-                user_agent="bot that does blah blah blah",
-                username='username')
+
 
 print("Logging in...")
 
@@ -27,13 +21,32 @@ words_to_match = ['vinaigrette',  'vinaigrettes', 'salad dressings', 'salad dres
                   'dressing', 'dressings', 'salad-dressing', 'salad-dressings', 'salad',
                   'lettuce']
 
+def load_black_list(filename):
+    """
+    filename: string pointing to the file that holds all of the previous
+    posts that have been replied to separated by newlines
+
+    returns a list of all the previous posts
+
+    raises IOError if file cannot be opened
+    """
+    with open(filename, 'r') as f:
+        black_list = [line.rstrip() for line in f]
+    return black_list
 
 # the comments that the bot has already reached
-with open("black_list.txt", 'r') as f:
-    black_list = [line.rstrip('\n') for line in f]
+black_list = load_black_list('black_list.txt')
 
 
 def run_bot():
+    # create the reddit object
+    # reddit sees who accesses this info so be descriptive
+    r = praw.Reddit(client_id='xxxxxxxxxxxxxx',
+                    client_secret='xxxxxxxxxxxxxxxxxxxxx',
+                    password='password',
+                    user_agent="bot that does blah blah blah",
+                    username='username')
+
     flag = False
     print("Grabbing subreddit...")
     # find the subreddit that you want to scan
@@ -68,7 +81,8 @@ def run_bot():
 
     print("Comment loop finished.")
 
-# run the bot a specified amount of times
-for i in range(0, num_of_iterations - 1):
-    run_bot()
-    time.sleep(5)
+if __name__ == '__main__':
+    # run the bot a specified amount of times
+    for i in range(0, num_of_iterations - 1):
+        run_bot()
+        time.sleep(5)
