@@ -13,9 +13,6 @@ replies to reddit comments about salad dressings
 
 
 
-print("Logging in...")
-
-
 # looking for the words/phrases about salad dressings
 words_to_match = ['vinaigrette',  'vinaigrettes', 'salad dressings', 'salad dressing',
                   'dressing', 'dressings', 'salad-dressing', 'salad-dressings', 'salad',
@@ -39,6 +36,7 @@ black_list = load_black_list('black_list.txt')
 
 
 def run_bot():
+    print("Logging in...")
     # create the reddit object
     # reddit sees who accesses this info so be descriptive
     r = praw.Reddit(client_id='xxxxxxxxxxxxxx',
