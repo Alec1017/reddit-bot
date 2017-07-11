@@ -25,10 +25,9 @@ class TestBlackListLoading(unittest.TestCase):
         '''
         writes some sample data to the file then tries loading it out
         '''
-        with open(self.filename, "w") as f:
-            f.write("TEST\n")
-            f.write("DATA")
-        assert bot.load_black_list(self.filename) == ["TEST", "DATA"]
+        black_list = ['TEST', 'DATA']
+        bot.save_black_list(self.filename, black_list)
+        assert bot.load_black_list(self.filename) == black_list
 
     def testEmptyFile(self):
         '''
@@ -37,6 +36,15 @@ class TestBlackListLoading(unittest.TestCase):
         open(self.filename, "w").close()
 
         assert bot.load_black_list(self.filename) == []
+
+    def testAppendBlackList(self):
+        '''
+        test the ability to append an item to the black_list
+        '''
+        black_list = ['SOME', 'EXAMPLE', 'STRINGS']
+        for item in black_list:
+            bot.append_to_black_list(self.filename, item)
+        assert bot.load_black_list(self.filename) == black_list
 
     @hypothesis.given(lists(text(printable)))
     def testLotsOfStrings(self, strings):
@@ -52,7 +60,7 @@ class TestBlackListLoading(unittest.TestCase):
                 f.write(item + "\n")
         assert bot.load_black_list(self.filename) == strings
 
-    def testNonExistantFile(self):
+    def testNonExistentFile(self):
         '''
         makes sure that an IOError is raised when the file does not exist
         '''
