@@ -3,15 +3,14 @@ import time
 import random
 from facts import RANDOM_FACTS
 
+# DEBATABLE: should this be a global constant?
+# I don't think so. Probably a command line option.
 num_of_comments = 50
 num_of_iterations = 10
-
 
 """
 replies to reddit comments about salad dressings
 """
-
-
 
 # looking for the words/phrases about salad dressings
 words_to_match = ['vinaigrette',  'vinaigrettes', 'salad dressings', 'salad dressing',
@@ -31,11 +30,35 @@ def load_black_list(filename):
         black_list = [line.rstrip() for line in f]
     return black_list
 
-# the comments that the bot has already reached
-black_list = load_black_list('black_list.txt')
+# NOTE: Not currently used. Only put in for the sake of complementary functions.
+def save_black_list(filename, list):
+    """
+    filename: string pointing to the file that holds all of the previous
+    posts that have been replied to separated by newlines
 
+    list: list of string ids to save
 
-def run_bot():
+    raises IOError if file cannot be saved
+    """
+    with open(filename, 'w') as f:
+        f.write('\n'.join(list) + '\n')
+
+def append_to_black_list(path, id):
+    """
+    path: string path to black_list file
+
+    id: id to black_list
+
+    raises IOError if file cannot be appended to
+    """
+    with open(path, 'a') as f:
+        f.write(id + '\n')
+
+def run_bot(black_list_path):
+
+    # load the id black_list
+    black_list = load_black_list(black_list_path)
+
     print("Logging in...")
     # create the reddit object
     # reddit sees who accesses this info so be descriptive
@@ -67,11 +90,9 @@ def run_bot():
             black_list.append(comment.id)
 
             # place the comment id into the black_list file
-            with open("black_list.txt", 'w') as f:
-                for s in black_list:
-                    f.write(s + '\n')
+            append_to_black_list(comment.id)
 
-            # the reply to the comment with a random fact
+            # reply to the comment with a random fact
             comment.reply("A fact about salad dressings: " + random.choice(RANDOM_FACTS))
             print("Reply successful!")
             flag = True
@@ -80,7 +101,10 @@ def run_bot():
     print("Comment loop finished.")
 
 if __name__ == '__main__':
+
+    BLACK_LIST_PATH = 'black_list.txt'
+
     # run the bot a specified amount of times
     for i in range(0, num_of_iterations - 1):
-        run_bot()
+        run_bot(BLACK_LIST_PATH)
         time.sleep(5)
