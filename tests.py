@@ -46,19 +46,6 @@ class TestBlackListLoading(unittest.TestCase):
             bot.append_to_black_list(self.filename, item)
         assert bot.load_black_list(self.filename) == black_list
 
-    @hypothesis.given(lists(text(printable)))
-    def testLotsOfStrings(self, strings):
-        '''
-        tests a bunch of generated strings
-        '''
-        with open(self.filename, "w") as f:
-            for item in strings:
-                #No whitespace on ends
-                hypothesis.assume(item.strip() == item)
-                #Assume no whitespace in middle of string
-                hypothesis.assume(item.split() ==[item])
-                f.write(item + "\n")
-        assert bot.load_black_list(self.filename) == strings
 
     def testNonExistentFile(self):
         '''
@@ -66,3 +53,62 @@ class TestBlackListLoading(unittest.TestCase):
         '''
         with pytest.raises(IOError):
             bot.load_black_list(self.filename)
+
+
+# Remove the file if it's there, if it's not, we don't care.
+def maybeRemoveFile(path):
+    try:
+        os.remove(path)
+    except OSError:
+        pass # we expect that call to fail if the test didnt make a file
+
+class HypothesisTestBlackList(unittest.TestCase):
+    '''
+    Test suite formulated for the hypothesis framework.
+    '''
+    def execute_example(self, f):
+        '''
+        This is the handler that will run the below function.
+        This class should be used for any Hypothesis test that needs a temporary
+        file to work off of via the self.filename.
+        '''
+
+        # Generate a unique filename
+        self.filename = str(uuid.uuid4())
+
+        # Try to run the test
+        try:
+            result = f()
+        except Exception:
+            # If the test fails, try to delete the file if it was created
+            maybeRemoveFile(self.filename)
+            # Raise the exception to signal the test failed
+            raise
+
+        # If it is a success, try to delete the file if it was created
+        maybeRemoveFile(self.filename)
+
+        # Return the result of the test
+        return result
+
+    @hypothesis.given(lists(text(printable)))
+    def testLotsOfStrings(self, strings):
+        '''
+        tests a bunch of generated strings
+        '''
+        # Assume the list is non-empty.
+        hypothesis.assume(len(strings) > 0)
+
+        # Fetch the given filename.
+        filename = self.filename
+
+        for ID in strings:
+            # No whitespace on ends
+            hypothesis.assume(ID.strip() == ID)
+            # Assume no whitespace in middle of string
+            hypothesis.assume(ID.split() == [ID])
+            # Append the black id to the black_list file
+            bot.append_to_black_list(filename, ID)
+
+        # Verify that the loaded data matches the input data
+        assert bot.load_black_list(filename) == strings
