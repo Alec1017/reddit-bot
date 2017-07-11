@@ -30,6 +30,7 @@ def load_black_list(filename):
         black_list = [line.rstrip() for line in f]
     return black_list
 
+# NOTE: Not currently used. Only put in for the sake of complementary functions.
 def save_black_list(filename, list):
     """
     filename: string pointing to the file that holds all of the previous
@@ -40,7 +41,7 @@ def save_black_list(filename, list):
     raises IOError if file cannot be saved
     """
     with open(filename, 'w') as f:
-        f.write('\n'.join(list))
+        f.write('\n'.join(list) + '\n')
 
 def append_to_black_list(path, id):
     """
