@@ -3,8 +3,6 @@ import time
 import random
 from facts import RANDOM_FACTS
 
-# DEBATABLE: should this be a global constant?
-# I don't think so. Probably a command line option.
 num_of_comments = 50
 num_of_iterations = 10
 
@@ -29,19 +27,6 @@ def load_black_list(filename):
     with open(filename, 'r') as f:
         black_list = [line.rstrip() for line in f]
     return black_list
-
-# NOTE: Not currently used. Only put in for the sake of complementary functions.
-def save_black_list(filename, list):
-    """
-    filename: string pointing to the file that holds all of the previous
-    posts that have been replied to separated by newlines
-
-    list: list of string ids to save
-
-    raises IOError if file cannot be saved
-    """
-    with open(filename, 'w') as f:
-        f.write('\n'.join(list) + '\n')
 
 def append_to_black_list(path, id):
     """
